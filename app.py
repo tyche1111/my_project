@@ -10,15 +10,29 @@ data = requests.get('http://www.yes24.com/24/category/bestseller?CategoryNumber=
 soup = BeautifulSoup(data.text, 'html.parser')
 
 # select를 이용해서, tr들을 불러오기
-books = soup.select('#category_layout > tbody > tr')
+books = soup.select('#category_layout > tr')
 
-# movies (tr들) 의 반복문을 돌리기
+# print(books)
+
+# # books (tr들) 의 반복문을 돌리기
 for best20 in books:
-    # movie 안에 a 가 있으면,
-    # category_layout > tbody > tr:nth-child(1) > td.goodsTxtInfo > p:nth-child(1) > a:nth-child(1)
-    a_tag = best20.select_one('tr > td.goodsTxtInfo > p > a')
 
-    print(a_tag)
+    rank_tag = best20.select_one('tr > td')
+#     # movie 안에 a 가 있으면,
+#     # category_layout > tbody > tr:nth-child(1) > td.goodsTxtInfo > p:nth-child(1) > a:nth-child(1)
+    a_tag = best20.select_one('tr > td.goodsTxtInfo > p > a')
+    # rankimg = best20.select('tr > td.goods1')
+
+    # print(rank_tag, a_tag)
+
+
+    if a_tag is not None:
+
+        title = a_tag.text
+        rank = rank_tag.text
+    #
+
+    print(rank, title)
 
 
     # if a_tag is not None:
