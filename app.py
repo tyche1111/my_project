@@ -1,6 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 
+from pymongo import MongoClient  # pymongo를 임포트 하기(패키지 인스톨 먼저 해야겠죠?)
+
+client = MongoClient('localhost', 27017)  # mongoDB는 27017 포트로 돌아갑니다.
+db = client.dbsparta
+
 # URL을 읽어서 HTML를 받아오고,
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
@@ -34,7 +39,12 @@ for best20 in books:
 
     print(rank, title)
 
+    doc = {
+        'rank': rank,
+        'title': title,
 
+    }
+    db.books.insert_one(doc)
     # if a_tag is not None:
     #     # goods1
     #     rank = best20.select_one('td:nth-child(1) > img')['alt']  # img 태그의 alt 속성값을 가져오기
