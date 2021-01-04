@@ -16,10 +16,16 @@ data = requests.get('http://www.yes24.com/24/category/bestseller?CategoryNumber=
 # HTML을 BeautifulSoup이라는 라이브러리를 활용해 검색하기 용이한 상태로 만듦
 soup = BeautifulSoup(data.text, 'html.parser')
 
+
+
 # select를 이용해서, tr들을 불러오기
 books = soup.select('#category_layout > tr')
+img = soup.find_all('#category_layout > tbody > td.image > div > a')
 
-# print(books)
+imgURL = soup.find("img")["src"]
+print(img)
+
+
 now = datetime.datetime.now()
 # # books (tr들) 의 반복문을 돌리기
 for best20 in books:
@@ -38,9 +44,10 @@ for best20 in books:
 
         nowDate = now.strftime('%Y-%m-%d')
 
-        print(rank, title, nowDate)
+        print(imgURL, rank, title, nowDate)
 
         doc = {
+            'imgURL': imgURL,
             'rank': rank,
             'title': title,
             'nowDate': nowDate,
