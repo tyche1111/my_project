@@ -1,11 +1,10 @@
 import requests
-import datetime
 from bs4 import BeautifulSoup
-
-from pymongo import MongoClient  # pymongo를 임포트 하기(패키지 인스톨 먼저 해야겠죠?)
+from pymongo import MongoClient
 
 client = MongoClient('localhost', 27017)  # mongoDB는 27017 포트로 돌아갑니다.
 db = client.dbsparta
+import datetime
 
 # URL을 읽어서 HTML를 받아오고,
 headers = {
@@ -16,47 +15,55 @@ data = requests.get('http://www.yes24.com/24/category/bestseller?CategoryNumber=
 # HTML을 BeautifulSoup이라는 라이브러리를 활용해 검색하기 용이한 상태로 만듦
 soup = BeautifulSoup(data.text, 'html.parser')
 
+# url = soup.find_all('img')
+#
+# print(url)
+#
+# for i in url:
+#     print(i.get('src'))
 
+# og_image = soup.select_one('meta[property="og:image"]')
+# url_image = og_image['content']
+#
+# print(url_image)
 
 # select를 이용해서, tr들을 불러오기
 books = soup.select('#category_layout > tr')
-img = soup.find_all('#category_layout > tbody > td.image > div > a')
 
-imgURL = soup.find("img")["src"]
-print(img)
+# category_layout > tbody > tr:nth-child(1) > td.image > div > a:nth-child(1) > img
 
+# category_layout > tbody > tr:nth-child(1) > td.image > div > a:nth-child(1) > img
 
 now = datetime.datetime.now()
 # # books (tr들) 의 반복문을 돌리기
 for best20 in books:
 
     rank_tag = best20.select_one('tr > td')
-    #     # movie 안에 a 가 있으면,
-    #     # category_layout > tbody > tr:nth-child(1) > td.goodsTxtInfo > p:nth-child(1) > a:nth-child(1)
-    a_tag = best20.select_one('tr > td.goodsTxtInfo > p > a')
-    # rankimg = best20.select('tr > td.goods1')
 
-    # print(rank_tag, a_tag)
+    a_tag = best20.select_one('tr > td.goodsTxtInfo > p > a')
+
+    img_url = best20.select_one('td.image > div > a:nth-child(1) > img')
 
     if a_tag is not None:
+        img = img_url['src'].replace('/S', '')
+
+        print(img)
+
         title = a_tag.text
         rank = rank_tag.text
 
         nowDate = now.strftime('%Y-%m-%d')
 
-        print(imgURL, rank, title, nowDate)
+        # print(rank, title, nowDate)
 
         doc = {
-            'imgURL': imgURL,
+
             'rank': rank,
             'title': title,
             'nowDate': nowDate,
 
         }
-        db.books.insert_one(doc)
-    # if a_tag is not None:
-    #     # goods1
-    #     rank = best20.select_one('td:nth-child(1) > img')['alt']  # img 태그의 alt 속성값을 가져오기
-    #     title = a_tag.text  # a 태그 사이의 텍스트를 가져오기
-    #     star = best20.select_one('td.point').text  # td 태그 사이의 텍스트를 가져오기
-    #     print(rank, title, star)
+        # db.books.insert_one(doc)
+
+# print(a_tag)
+# print(rank_tag, a_tag)
